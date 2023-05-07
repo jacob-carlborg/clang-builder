@@ -1,0 +1,34 @@
+inputs:
+  github_token:
+    description: The GitHub token used to create the release
+
+runs:
+  using: composite
+  steps:
+    - name: Extract version
+      shell: bash
+      run: echo "llvm_version=${GITHUB_REF#refs/tags/v}" | cut -d '+' -f 1 >> $GITHUB_ENV
+
+    - name: Clone LLVM
+      uses: actions/checkout@v3
+      with:
+        path: llvm
+        repository: llvm/llvm-project
+        ref: llvmorg-${{ env.llvm_version }}
+        persist-credentials: false
+
+    - name: Build
+      shell: bash
+      run: ./build_llvm.sh '${{ env.llvm_version }}'
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: LLVM ${{ env.llvm_version }}
+        draft: true
+        files: |
+          llvm*.tar.xz
+          llvm*.7z
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}

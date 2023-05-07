@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: '*'
+    tags: v*
+  pull_request:
+    branches:
+      - master
+
+env:
+  MACOSX_DEPLOYMENT_TARGET: 10.9
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.arch }}-${{ matrix.data.os.target }}${{ matrix.data.os.version }}
+    runs-on: ${{ matrix.data.os.host }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      BUILDER_ARCH: ${{ matrix.arch }}
+      BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
+      BUILDER_EXTRA_CMAKE_FLAGS: ${{ matrix.data.extra_cmake_flags }}
+      BUILDER_OS: ${{ matrix.data.os.target }}
+      BUILDER_OS_VERSION: ${{ matrix.data.os.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64]
+        data:
+          - os:
+              target: macos
+              host: macOS-latest
+
+          - os:
+              target: windows
+              host: windows-latest
+
+        include:
+          - arch: arm64
+            data:
+              cross_compile: true
+              os:
+                target: macos
+                host: macOS-latest
+              extra_cmake_flags: >
+                -DCMAKE_OSX_ARCHITECTURES=arm64
+                -DLLVM_ENABLE_ZSTD=OFF
+                -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-macos
+                -DLLVM_TARGET_ARCH=arm64
+
+    steps:
+      - name: Disk space
+        run: df -h
+
+      - name: Install dependencies
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install dependencies
+        if: runner.os == 'Windows'
+        run: choco install ninja
+
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/workflows/support/shared
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  build_linux:
+    name: ${{ matrix.arch }}-linux
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    env:
+      BUILDER_ARCH: ${{ matrix.arch }}
+      BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
+      BUILDER_EXTRA_CMAKE_FLAGS: ${{ matrix.data.extra_cmake_flags }}
+      BUILDER_OS: linux
+      BUILDER_OS_VERSION: ${{ matrix.data.os.version }}
+    strategy:
+      matrix:
+        arch: [x86_64]
+
+    steps:
+      - name: Install dependencies
+        run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja
+
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/workflows/support/shared
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
