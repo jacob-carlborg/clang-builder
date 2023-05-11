@@ -10,6 +10,7 @@ on:
 
 env:
   MACOSX_DEPLOYMENT_TARGET: 10.9
+  sdk_version: '0.0.1'
 
 permissions:
   contents: write
@@ -40,23 +41,24 @@ jobs:
         #       target: windows
         #       host: windows-latest
 
-        # include:
-        #   - arch: arm64
-        #     data:
-        #       cross_compile: true
-        #       os:
-        #         target: macos
-        #         host: macOS-latest
-        #       extra_cmake_flags: >
-        #         -DCMAKE_OSX_ARCHITECTURES=arm64
-        #         -DLLVM_ENABLE_ZSTD=OFF
-        #         -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-macos
-        #         -DLLVM_TARGET_ARCH=arm64
+        include:
+          # - arch: arm64
+          #   data:
+          #     cross_compile: true
+          #     os:
+          #       target: macos
+          #       host: macOS-latest
+          #     extra_cmake_flags: >
+          #       -DCMAKE_OSX_ARCHITECTURES=arm64
+          #       -DLLVM_ENABLE_ZSTD=OFF
+          #       -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-macos
+          #       -DLLVM_TARGET_ARCH=arm64
 
           - arch: x86_64
             data:
               cross_compile: true
               target_triple: x86_64-unknown-freebsd13.1
+              install_sdk: true
               os:
                 target: freebsd
                 host: ubuntu-latest
@@ -80,8 +82,9 @@ jobs:
           persist-credentials: false
 
       - name: Install SDK
+        if: matrix.install_sdk
         run: |
-          curl -L -o sdk.tar.xz --retry 3 https://github.com/d-cross-compiler/sdk-extractor/releases/download/v0.0.1/sdk-0.0.1-${{ matrix.target_triple }}.tar.xz
+          curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v{{ env.sdk_version }}/sdk-{{ env.sdk_version }}-${{ matrix.target_triple }}.tar.xz'
           tar xf sdk.tar.xz
 
       - uses: ./.github/workflows/support/shared
