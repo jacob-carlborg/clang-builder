@@ -4,11 +4,11 @@
 # BUILDER_ARCH: the target architecture (required)
 # BUILDER_CROSS_COMPILE: 'true' indicates if we're cross-compiling
 # BUILDER_EXTRA_CMAKE_FLAGS: extra flags appended to CMake
-# BUILDER_OS: the target operating system (required)
-# BUILDER_OS_VERSION: the version of the target operating system
+# BUILDER_OS: the target operating system (required). The name needs to be what Cmake expects: https://gitlab.kitware.com/cmake/cmake/-/issues/21489#note_1077167.
+# BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
 
-set -ueo pipefail
+set -uexo pipefail
 
 version="$1"
 llvm_dir="$GITHUB_WORKSPACE/llvm/llvm"
@@ -16,6 +16,8 @@ clang_dir="$GITHUB_WORKSPACE/llvm/clang"
 native_build_dir="$GITHUB_WORKSPACE/build_native"
 install_name="llvm-$version"
 build_dir="$GITHUB_WORKSPACE/$install_name"
+target_os="$(echo $BUILDER_OS | tr '[:upper:]' '[:lower:]')"
+toolchain_files_dir="$GITHUB_WORKSPACE/toolchain_files"
 base_cmake_flags=$(cat << EOF
 -D CMAKE_BUILD_TYPE=Release
 -D COMPILER_RT_INCLUDE_TESTS=Off
@@ -29,19 +31,35 @@ base_cmake_flags=$(cat << EOF
 EOF
 )
 
+export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
+
 if [ "$BUILDER_CROSS_COMPILE" = true ]; then
   export MACOSX_DEPLOYMENT_TARGET=11
 extra_cmake_flags=$(cat << EOF
 -D CLANG_TABLEGEN=$native_build_dir/bin/clang-tblgen
 -D LLVM_CONFIG_PATH=$native_build_dir/bin/llvm-config
+-D LLVM_DEFAULT_TARGET_TRIPLE=$BUILDER_TARGET_TRIPLE
 -D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen
-$BUILDER_EXTRA_CMAKE_FLAGS
+-D LLVM_TARGET_ARCH=$BUILDER_ARCH
+${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
+  if ! [ "$target_os" = 'macos' ]; then
+    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
+  fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
+
+setup_cross_toolchain() {
+  (! [ "$BUILDER_CROSS_COMPILE" = true ] || [ "$target_os" = 'macos' ]) && return
+
+  mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
+  ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
+  ln -s "$(which clang++)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang++"
+  ln -s "$(lld_path)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
+}
 
 build_native() {
   ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
@@ -100,7 +118,6 @@ archive() {
   local headers="$(find $install_name/include/clang-c -name '*.h' -print0 | xargs -0)"
   local binaries="$(find $install_name/bin -name 'llvm-config*' -print0 | xargs -0)"
 
-  ls -l "$install_name/lib/clang"
   $command $libraries $headers $binaries "$install_name/lib/clang"
 }
 
@@ -121,7 +138,7 @@ host_os() {
 }
 
 release_name() {
-  echo "llvm-$version-$BUILDER_OS-$BUILDER_ARCH"
+  echo "llvm-$version-$BUILDER_TARGET_TRIPLE"
 }
 
 archive_name() {
@@ -138,6 +155,22 @@ archive_path() {
   echo "$GITHUB_WORKSPACE/$(archive_name)"
 }
 
+lld_path() {
+  if command -v lld > /dev/null; then
+    which lld
+  elif command -v ld.lld > /dev/null; then
+    which ld.lld
+  else
+    for i in {99..14}; do
+      command -v "lld-$i" > /dev/null && which "lld-$i" && return
+    done
+
+    echo 'Failed to find LLD'
+    exit 1
+  fi
+}
+
+setup_cross_toolchain
 build_native
 build
 cleanup
