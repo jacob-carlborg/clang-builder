@@ -31,32 +31,41 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64]
-        data:
-          - os:
-              target: macos
-              host: macOS-latest
+        # data:
+        #   - os:
+        #       target: macos
+        #       host: macOS-latest
+        #
+        #   - os:
+        #       target: windows
+        #       host: windows-latest
 
-          - os:
-              target: windows
-              host: windows-latest
+        # include:
+        #   - arch: arm64
+        #     data:
+        #       cross_compile: true
+        #       os:
+        #         target: macos
+        #         host: macOS-latest
+        #       extra_cmake_flags: >
+        #         -DCMAKE_OSX_ARCHITECTURES=arm64
+        #         -DLLVM_ENABLE_ZSTD=OFF
+        #         -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-macos
+        #         -DLLVM_TARGET_ARCH=arm64
 
-        include:
-          - arch: arm64
+          - arch: x86_64
             data:
               cross_compile: true
+              target_triple: x86_64-unknown-freebsd13.1
               os:
-                target: macos
-                host: macOS-latest
+                target: freebsd
+                host: ubuntu-latest
               extra_cmake_flags: >
-                -DCMAKE_OSX_ARCHITECTURES=arm64
-                -DLLVM_ENABLE_ZSTD=OFF
-                -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-macos
-                -DLLVM_TARGET_ARCH=arm64
+                -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-freebsd13.1
+                -DLLVM_TARGET_ARCH=x86_64
+                -DCMAKE_SYSROOT=${{ matrix.target_triple }}
 
     steps:
-      - name: Disk space
-        run: df -h
-
       - name: Install dependencies
         if: runner.os == 'macOS'
         run: brew install ninja
@@ -69,6 +78,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+
+      - name: Install SDK
+        run: |
+          curl -L -o sdk.tar.xz --retry 3 https://github.com/d-cross-compiler/sdk-extractor/releases/download/v0.0.1/sdk-0.0.1-${{ matrix.target_triple }}.tar.xz
+          tar xf sdk.tar.xz
 
       - uses: ./.github/workflows/support/shared
         with:
