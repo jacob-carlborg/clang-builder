@@ -78,7 +78,7 @@ jobs:
 
       - name: Install dependencies
         if: runner.os == 'Linux'
-        run: sudo apt update && sudo apt install -y ninja
+        run: sudo apt update && sudo apt install -y ninja-build
 
       - name: Clone repository
         uses: actions/checkout@v3
