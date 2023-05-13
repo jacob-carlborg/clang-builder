@@ -63,6 +63,7 @@ build() {
     -G Ninja \
     $base_cmake_flags \
     -DLIBCLANG_BUILD_STATIC=On \
+    --trace-expand \
     $extra_cmake_flags
 
   cmake --build .

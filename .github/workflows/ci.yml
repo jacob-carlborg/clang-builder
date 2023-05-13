@@ -90,6 +90,7 @@ jobs:
         run: |
           curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v${{ env.sdk_version }}/sdk-${{ env.sdk_version }}-${{ matrix.data.target_triple }}.tar.xz'
           tar xf sdk.tar.xz
+          tree .
 
       - uses: ./.github/workflows/support/shared
         with:
