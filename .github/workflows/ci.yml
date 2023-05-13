@@ -65,7 +65,7 @@ jobs:
               extra_cmake_flags: >
                 -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-freebsd13.1
                 -DLLVM_TARGET_ARCH=x86_64
-                -DCMAKE_SYSROOT=${{ github.workspace }}/x86_64-unknown-freebsd13.1
+                -DCMAKE_SYSROOT=../x86_64-unknown-freebsd13.1
 
     steps:
       - name: Install dependencies

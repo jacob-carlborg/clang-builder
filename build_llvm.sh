@@ -59,7 +59,7 @@ build() {
   mkdir -p "$build_dir"
   pushd "$build_dir"
 
-  CFLAGS=-v CXXFLAGS=-v cmake "$llvm_dir" \
+  cmake "$llvm_dir" \
     -G Ninja \
     $base_cmake_flags \
     -DLIBCLANG_BUILD_STATIC=On \
