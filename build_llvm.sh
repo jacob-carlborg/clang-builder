@@ -7,6 +7,7 @@
 # BUILDER_OS: the target operating system (required)
 # BUILDER_OS_VERSION: the version of the target operating system
 # BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
+# BUILDER_CUSTOM_SYSROOT: 'true' if a custom sysroot should be used (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
 
 set -ueo pipefail
@@ -41,7 +42,7 @@ extra_cmake_flags=$(cat << EOF
 $BUILDER_EXTRA_CMAKE_FLAGS
 EOF
 )
-  if ! [ "$BUILDER_OS" = 'macos' ]; then
+  if ! [ "$BUILDER_CUSTOM_SYSROOT" = true ]; then
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_SYSROOT=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE"
   fi
 else
