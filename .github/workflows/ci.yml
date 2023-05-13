@@ -86,11 +86,10 @@ jobs:
           persist-credentials: false
 
       - name: Install SDK
-        if: matrix.install_sdk
+        if: matrix.data.install_sdk
         run: |
           curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v{{ env.sdk_version }}/sdk-{{ env.sdk_version }}-${{ matrix.target_triple }}.tar.xz'
           tar xf sdk.tar.xz
-          tree .
 
       - uses: ./.github/workflows/support/shared
         with:
