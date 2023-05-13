@@ -6,6 +6,7 @@
 # BUILDER_EXTRA_CMAKE_FLAGS: extra flags appended to CMake
 # BUILDER_OS: the target operating system (required)
 # BUILDER_OS_VERSION: the version of the target operating system
+# BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
 
 set -ueo pipefail
@@ -34,10 +35,15 @@ if [ "$BUILDER_CROSS_COMPILE" = true ]; then
 extra_cmake_flags=$(cat << EOF
 -D CLANG_TABLEGEN=$native_build_dir/bin/clang-tblgen
 -D LLVM_CONFIG_PATH=$native_build_dir/bin/llvm-config
+-D LLVM_DEFAULT_TARGET_TRIPLE=$BUILDER_TARGET_TRIPLE
 -D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen
+-D LLVM_TARGET_ARCH=$BUILDER_ARCH
 $BUILDER_EXTRA_CMAKE_FLAGS
 EOF
 )
+  if ! [ "$BUILDER_OS" = 'macos' ]; then
+    extra_cmake_flags="$extra_cmake_flags -D CMAKE_SYSROOT=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE"
+  fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
