@@ -55,6 +55,7 @@ $extra_cmake_flags
 -D CMAKE_C_FLAGS=-fuse-ld=lld
 -D CMAKE_CXX_FLAGS=-fuse-ld=lld
 -D CMAKE_EXE_LINKER_FLAGS=-stdlib=libc++
+-D LLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=True
 EOF
 )
   fi
