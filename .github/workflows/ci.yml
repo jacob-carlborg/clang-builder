@@ -28,7 +28,6 @@ jobs:
       BUILDER_EXTRA_CMAKE_FLAGS: ${{ matrix.data.extra_cmake_flags }}
       BUILDER_OS: ${{ matrix.data.os.target }}
       BUILDER_OS_VERSION: ${{ matrix.data.os.version }}
-      BUILDER_CUSTOM_SYSROOT: ${{ matrix.data.install_sdk }}
       BUILDER_TARGET_TRIPLE: ${{ matrix.data.target_triple }}
     strategy:
       fail-fast: false

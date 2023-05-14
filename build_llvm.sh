@@ -7,7 +7,6 @@
 # BUILDER_OS: the target operating system (required)
 # BUILDER_OS_VERSION: the version of the target operating system
 # BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
-# BUILDER_CUSTOM_SYSROOT: 'true' if a custom sysroot should be used (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
 
 set -uexo pipefail
@@ -39,16 +38,38 @@ extra_cmake_flags=$(cat << EOF
 -D LLVM_DEFAULT_TARGET_TRIPLE=$BUILDER_TARGET_TRIPLE
 -D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen
 -D LLVM_TARGET_ARCH=$BUILDER_ARCH
-$BUILDER_EXTRA_CMAKE_FLAGS
+${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
-  if ! [ "$BUILDER_CUSTOM_SYSROOT" = true ]; then
-    extra_cmake_flags="$extra_cmake_flags -D CMAKE_SYSROOT=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE"
+  if ! [ "$BUILDER_OS" = 'macos' ]; then
+extra_cmake_flags=$(cat << EOF
+$extra_cmake_flags
+-D CMAKE_SYSTEM_NAME=$BUILDER_OS
+-D CMAKE_SYSTEM_PROCESSOR=$BUILDER_ARCH
+-D CMAKE_C_COMPILER_TARGET=$BUILDER_TARGET_TRIPLE
+-D CMAKE_CXX_COMPILER_TARGET=$BUILDER_TARGET_TRIPLE
+-D CMAKE_SYSROOT=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE
+
+-D CMAKE_C_FLAGS=-fuse-ld=ld.lld
+-D CMAKE_CXX_FLAGS=-fuse-ld=ld.lld
+EOF
+)
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
+
+# -D LLVM_USE_LINKER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/lld
+# -D CMAKE_C_FLAGS=-fuse-ld=lld
+# -D CMAKE_CXX_FLAGS=-fuse-ld=lld
+# -D CMAKE_C_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang
+# -D CMAKE_CXX_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang++
+
+# -D LLVM_USE_LINKER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/lld
+# -D CMAKE_C_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang
+# -D CMAKE_CXX_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang++
+
 
 build_native() {
   ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
