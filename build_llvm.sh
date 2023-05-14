@@ -52,8 +52,8 @@ $extra_cmake_flags
 
 -D CMAKE_C_COMPILER=clang
 -D CMAKE_CXX_COMPILER=clang++
--D CMAKE_C_FLAGS=-fuse-ld=ld.lld
--D CMAKE_CXX_FLAGS=-fuse-ld=ld.lld
+-D CMAKE_C_FLAGS=-fuse-ld=lld
+-D CMAKE_CXX_FLAGS=-fuse-ld=lld
 EOF
 )
   fi
