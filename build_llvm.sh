@@ -10,7 +10,7 @@
 # BUILDER_CUSTOM_SYSROOT: 'true' if a custom sysroot should be used (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
 
-set -ueo pipefail
+set -uexo pipefail
 
 version="$1"
 llvm_dir="$GITHUB_WORKSPACE/llvm/llvm"
@@ -72,7 +72,7 @@ build() {
     -DLIBCLANG_BUILD_STATIC=On \
     $extra_cmake_flags
 
-  cmake --build .
+  CFLAGS=-v CXXFLAGS=-v cmake --build .
   popd
 }
 
@@ -107,7 +107,7 @@ archive() {
   local headers="$(find $install_name/include/clang-c -name '*.h' -print0 | xargs -0)"
   local binaries="$(find $install_name/bin -name 'llvm-config*' -print0 | xargs -0)"
 
-  ls -l "$install_name/lib/clang"
+  file "$install_name/bin/clang"
   $command $libraries $headers $binaries "$install_name/lib/clang"
 }
 
