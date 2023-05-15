@@ -8,6 +8,7 @@ set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_AR llvm-ar)
 set(CMAKE_C_FLAGS -fuse-ld=lld)
 set(CMAKE_CXX_FLAGS -fuse-ld=lld)
+set(LLVM_ENABLE_LIBCXX true)
 
 # these variables tell CMake to avoid using any binary it finds in
 # the sysroot, while picking headers and libraries exclusively from it
