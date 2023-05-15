@@ -6,8 +6,8 @@ set(CMAKE_SYSROOT $ENV{GITHUB_WORKSPACE}/x86_64-unknown-freebsd13.1)
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_AR llvm-ar)
-set(CMAKE_C_LINK_EXECUTABLE lld)
-set(CMAKE_CXX_LINK_EXECUTABLE lld)
+set(CMAKE_C_LINK_EXECUTABLE ld.lld)
+set(CMAKE_CXX_LINK_EXECUTABLE ld.lld)
 
 # these variables tell CMake to avoid using any binary it finds in
 # the sysroot, while picking headers and libraries exclusively from it
