@@ -17,6 +17,7 @@ clang_dir="$GITHUB_WORKSPACE/llvm/clang"
 native_build_dir="$GITHUB_WORKSPACE/build_native"
 install_name="llvm-$version"
 build_dir="$GITHUB_WORKSPACE/$install_name"
+cross_toolchain_dir="$GITHUB_WORKSPACE/bin"
 base_cmake_flags=$(cat << EOF
 -D CMAKE_BUILD_TYPE=Release
 -D COMPILER_RT_INCLUDE_TESTS=Off
@@ -43,37 +44,11 @@ EOF
 )
   if ! [ "$BUILDER_OS" = 'macos' ]; then
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE.cmake"
-# extra_cmake_flags=$(cat << EOF
-# $extra_cmake_flags
-# -D CMAKE_SYSTEM_NAME=$BUILDER_OS
-# -D CMAKE_SYSTEM_PROCESSOR=$BUILDER_ARCH
-# -D CMAKE_C_COMPILER_TARGET=$BUILDER_TARGET_TRIPLE
-# -D CMAKE_CXX_COMPILER_TARGET=$BUILDER_TARGET_TRIPLE
-# -D CMAKE_SYSROOT=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE
-#
-# -D CMAKE_C_COMPILER=clang
-# -D CMAKE_CXX_COMPILER=clang++
-# -D CMAKE_C_FLAGS=-fuse-ld=lld
-# -D CMAKE_CXX_FLAGS=-fuse-ld=lld
-# -D CMAKE_EXE_LINKER_FLAGS=-stdlib=libc++
-# EOF
-# )
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
-
-# -D LLVM_USE_LINKER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/lld
-# -D CMAKE_C_FLAGS=-fuse-ld=lld
-# -D CMAKE_CXX_FLAGS=-fuse-ld=lld
-# -D CMAKE_C_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang
-# -D CMAKE_CXX_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang++
-
-# -D LLVM_USE_LINKER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/lld
-# -D CMAKE_C_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang
-# -D CMAKE_CXX_COMPILER=/Users/jacobcarlborg/Downloads/clang+llvm-16.0.0-arm64-apple-darwin22.0/bin/clang++
-
 
 build_native() {
   ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
