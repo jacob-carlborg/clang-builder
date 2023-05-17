@@ -91,6 +91,10 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup tmate session
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
+
   # build_linux:
   #   name: ${{ matrix.arch }}-linux
   #   runs-on: ubuntu-latest
