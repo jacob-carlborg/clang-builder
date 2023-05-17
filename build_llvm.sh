@@ -4,7 +4,7 @@
 # BUILDER_ARCH: the target architecture (required)
 # BUILDER_CROSS_COMPILE: 'true' indicates if we're cross-compiling
 # BUILDER_EXTRA_CMAKE_FLAGS: extra flags appended to CMake
-# BUILDER_OS: the target operating system (required)
+# BUILDER_OS: the target operating system (required). The name needs to be what Cmake expects: https://gitlab.kitware.com/cmake/cmake/-/issues/21489#note_1077167.
 # BUILDER_OS_VERSION: the version of the target operating system
 # BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
@@ -18,6 +18,7 @@ native_build_dir="$GITHUB_WORKSPACE/build_native"
 install_name="llvm-$version"
 build_dir="$GITHUB_WORKSPACE/$install_name"
 cross_toolchain_dir="$GITHUB_WORKSPACE/bin"
+target_os="$(echo '$BUILDER_OS' | tr '[:upper:]' '[:lower:]')"
 base_cmake_flags=$(cat << EOF
 -D CMAKE_BUILD_TYPE=Release
 -D COMPILER_RT_INCLUDE_TESTS=Off
@@ -42,7 +43,7 @@ extra_cmake_flags=$(cat << EOF
 ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
-  if ! [ "$BUILDER_OS" = 'macos' ]; then
+  if ! [ "$target_os" = 'macos' ]; then
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE.cmake"
   fi
 else
@@ -128,7 +129,7 @@ host_os() {
 }
 
 release_name() {
-  echo "llvm-$version-$BUILDER_OS-$BUILDER_ARCH"
+  echo "llvm-$version-$target_os-$BUILDER_ARCH"
 }
 
 archive_name() {
