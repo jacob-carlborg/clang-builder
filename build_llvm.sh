@@ -73,7 +73,7 @@ build() {
     -DLIBCLANG_BUILD_STATIC=On \
     $extra_cmake_flags
 
-  CFLAGS=-v CXXFLAGS=-v cmake --build .
+  cmake --build .
   popd
 }
 
