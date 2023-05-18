@@ -45,7 +45,7 @@ EOF
 )
   if ! [ "$target_os" = 'macos' ]; then
     export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
-    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$BUILDER_OS.cmake"
+    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
