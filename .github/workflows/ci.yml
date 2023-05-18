@@ -63,6 +63,15 @@ jobs:
                 target: FreeBSD
                 host: ubuntu-latest
 
+          - arch: x86_64
+            data:
+              cross_compile: true
+              target_triple: x86_64-unknown-openbsd7.3
+              install_sdk: true
+              os:
+                target: OpenBSD
+                host: ubuntu-latest
+
     steps:
       - name: Install dependencies
         if: runner.os == 'macOS'
