@@ -18,6 +18,7 @@ native_build_dir="$GITHUB_WORKSPACE/build_native"
 install_name="llvm-$version"
 build_dir="$GITHUB_WORKSPACE/$install_name"
 target_os="$(echo $BUILDER_OS | tr '[:upper:]' '[:lower:]')"
+toolchain_files_dir="$GITHUB_WORKSPACE/toolchain_files"
 base_cmake_flags=$(cat << EOF
 -D CMAKE_BUILD_TYPE=Release
 -D COMPILER_RT_INCLUDE_TESTS=Off
@@ -44,7 +45,7 @@ EOF
 )
   if ! [ "$target_os" = 'macos' ]; then
     export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
-    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE.cmake"
+    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$BUILDER_OS.cmake"
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
