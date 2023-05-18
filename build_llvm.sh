@@ -17,8 +17,7 @@ clang_dir="$GITHUB_WORKSPACE/llvm/clang"
 native_build_dir="$GITHUB_WORKSPACE/build_native"
 install_name="llvm-$version"
 build_dir="$GITHUB_WORKSPACE/$install_name"
-cross_toolchain_dir="$GITHUB_WORKSPACE/bin"
-target_os="$(echo '$BUILDER_OS' | tr '[:upper:]' '[:lower:]')"
+target_os="$(echo $BUILDER_OS | tr '[:upper:]' '[:lower:]')"
 base_cmake_flags=$(cat << EOF
 -D CMAKE_BUILD_TYPE=Release
 -D COMPILER_RT_INCLUDE_TESTS=Off
@@ -44,12 +43,22 @@ ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
   if ! [ "$target_os" = 'macos' ]; then
+    export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/$BUILDER_TARGET_TRIPLE.cmake"
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
+
+setup_cross_toolchain() {
+  ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
+
+  mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
+  ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
+  ln -s "$(which clang++)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang++"
+  ln -s "$(which ld.lld)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
+}
 
 build_native() {
   ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
@@ -146,6 +155,7 @@ archive_path() {
   echo "$GITHUB_WORKSPACE/$(archive_name)"
 }
 
+setup_cross_toolchain
 build_native
 build
 cleanup
