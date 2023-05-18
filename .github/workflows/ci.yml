@@ -64,32 +64,36 @@ jobs:
                 host: ubuntu-latest
 
     steps:
-      - name: Install dependencies
-        if: runner.os == 'macOS'
-        run: brew install ninja
+      - name: Setup tmate session
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
 
-      - name: Install dependencies
-        if: runner.os == 'Windows'
-        run: choco install ninja
-
-      - name: Install dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt update && sudo apt install -y ninja-build
-
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-
-      - name: Install SDK
-        if: matrix.data.install_sdk
-        run: |
-          curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v${{ env.sdk_version }}/sdk-${{ env.sdk_version }}-${{ matrix.data.target_triple }}.tar.xz'
-          tar xf sdk.tar.xz
-
-      - uses: ./.github/workflows/support/shared
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Install dependencies
+      #   if: runner.os == 'macOS'
+      #   run: brew install ninja
+      #
+      # - name: Install dependencies
+      #   if: runner.os == 'Windows'
+      #   run: choco install ninja
+      #
+      # - name: Install dependencies
+      #   if: runner.os == 'Linux'
+      #   run: sudo apt update && sudo apt install -y ninja-build
+      #
+      # - name: Clone repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     persist-credentials: false
+      #
+      # - name: Install SDK
+      #   if: matrix.data.install_sdk
+      #   run: |
+      #     curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v${{ env.sdk_version }}/sdk-${{ env.sdk_version }}-${{ matrix.data.target_triple }}.tar.xz'
+      #     tar xf sdk.tar.xz
+      #
+      # - uses: ./.github/workflows/support/shared
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Setup tmate session
       #   if: failure()
