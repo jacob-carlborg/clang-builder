@@ -57,7 +57,7 @@ setup_cross_toolchain() {
   mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
   ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
   ln -s "$(which clang++)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang++"
-  ls -s "$(lld_path)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
+  ln -s "$(lld_path)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
 }
 
 build_native() {
