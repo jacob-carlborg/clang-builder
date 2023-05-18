@@ -53,7 +53,7 @@ else
 fi
 
 setup_cross_toolchain() {
-  ! [ "$BUILDER_CROSS_COMPILE" = true ] && return
+  ! [ "$BUILDER_CROSS_COMPILE" = true ] && ! [ "$target_os" = 'macos' ] && return
 
   mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
   ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
