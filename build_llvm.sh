@@ -57,7 +57,7 @@ setup_cross_toolchain() {
   mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
   ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
   ln -s "$(which clang++)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang++"
-  ln -s "$(which lld)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
+  ls -s "$(lld_path)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
 }
 
 build_native() {
@@ -153,6 +153,25 @@ archive_name() {
 
 archive_path() {
   echo "$GITHUB_WORKSPACE/$(archive_name)"
+}
+
+lld_path() {
+  if which lld > /dev/null; then
+    which lld
+  elif which ld.lld > /dev/null; then
+    which ld.lld
+  elif which lld-17 > /dev/null; then
+    which lld-17
+  elif which lld-16 > /dev/null; then
+    which lld-16
+  elif which lld-15 > /dev/null; then
+    which lld-15
+  elif which lld-14 > /dev/null; then
+     which lld-14
+  else
+    echo 'Failed to find LLD'
+    exit 1
+  fi
 }
 
 setup_cross_toolchain
