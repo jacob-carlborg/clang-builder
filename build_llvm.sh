@@ -32,6 +32,8 @@ base_cmake_flags=$(cat << EOF
 EOF
 )
 
+export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
+
 if [ "$BUILDER_CROSS_COMPILE" = true ]; then
   export MACOSX_DEPLOYMENT_TARGET=11
 extra_cmake_flags=$(cat << EOF
@@ -44,7 +46,6 @@ ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
   if ! [ "$target_os" = 'macos' ]; then
-    export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$BUILDER_OS.cmake"
   fi
 else
@@ -53,7 +54,7 @@ else
 fi
 
 setup_cross_toolchain() {
-  ! [ "$BUILDER_CROSS_COMPILE" = true ] && ! [ "$target_os" = 'macos' ] && return
+  (! [ "$BUILDER_CROSS_COMPILE" = true ] || [ "$target_os" = 'macos' ]) && return
 
   mkdir -p "$BUILDER_CROSS_TOOLCHAIN_DIR"
   ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
