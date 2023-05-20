@@ -33,14 +33,14 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64]
-        data:
-          # - os:
-          #     target: macos
-          #     host: macOS-latest
-          #
-          # - os:
-          #     target: windows
-          #     host: windows-latest
+        # data:
+        #   - os:
+        #       target: macos
+        #       host: macOS-latest
+        #
+        #   - os:
+        #       target: windows
+        #       host: windows-latest
 
         include:
           # - arch: arm64
