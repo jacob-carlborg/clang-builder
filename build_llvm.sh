@@ -46,7 +46,7 @@ ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
   if ! [ "$target_os" = 'macos' ]; then
-    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$BUILDER_OS.cmake"
+    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
   fi
 else
   export MACOSX_DEPLOYMENT_TARGET=10.9
