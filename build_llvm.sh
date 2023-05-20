@@ -119,7 +119,6 @@ archive() {
   local headers="$(find $install_name/include/clang-c -name '*.h' -print0 | xargs -0)"
   local binaries="$(find $install_name/bin -name 'llvm-config*' -print0 | xargs -0)"
 
-  file "$install_name/bin/clang"
   $command $libraries $headers $binaries "$install_name/lib/clang"
 }
 
