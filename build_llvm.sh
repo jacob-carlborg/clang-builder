@@ -60,7 +60,6 @@ setup_cross_toolchain() {
   ln -s "$(which clang)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang"
   ln -s "$(which clang++)" "$BUILDER_CROSS_TOOLCHAIN_DIR/clang++"
   ln -s "$(lld_path)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ld"
-  ln -s "$(which ninja)" "$BUILDER_CROSS_TOOLCHAIN_DIR/ninja"
 }
 
 build_native() {
