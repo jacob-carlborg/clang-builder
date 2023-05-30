@@ -115,7 +115,7 @@ archive() {
     local command="tar -c -J -f $(archive_path)"
   fi
 
-  local libraries="$(find $install_name/lib \( -name '*.lib' -or -name '*.a' -or -name '*clang.so*' -or -name '*clang.dll*' -or -name '*clang.dylib' \) -maxdepth 1 -print0 | xargs -0)"
+  local libraries="$(find $install_name/lib \( -name '*.lib' -or -name '*.a' \) -maxdepth 1 -print0 | xargs -0)"
   local headers="$(find $install_name/include/clang-c -name '*.h' -print0 | xargs -0)"
   local binaries="$(find $install_name/bin -name 'llvm-config*' -print0 | xargs -0)"
 
