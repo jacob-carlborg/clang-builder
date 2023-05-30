@@ -53,7 +53,6 @@ jobs:
                 host: macOS-latest
               extra_cmake_flags: >
                 -DCMAKE_OSX_ARCHITECTURES=arm64
-                -DLLVM_ENABLE_ZSTD=OFF
 
           - arch: x86_64
             data:
