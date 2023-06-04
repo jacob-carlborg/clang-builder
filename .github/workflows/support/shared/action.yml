@@ -19,8 +19,8 @@ runs:
         persist-credentials: false
 
     - name: Build
-      shell: bash
-      run: ./build_llvm.sh '${{ env.llvm_version }}'
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      run: bash build_llvm.sh '${{ env.llvm_version }}'
 
     - name: Create Release
       id: create_release

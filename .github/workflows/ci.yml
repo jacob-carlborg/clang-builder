@@ -64,6 +64,9 @@ jobs:
                 host: ubuntu-latest
 
     steps:
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Install dependencies
         if: runner.os == 'macOS'
         run: brew install ninja
