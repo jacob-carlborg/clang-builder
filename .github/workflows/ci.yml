@@ -64,6 +64,9 @@ jobs:
                 host: ubuntu-latest
 
     steps:
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Install dependencies
         if: runner.os == 'macOS'
         run: brew install ninja
@@ -71,10 +74,6 @@ jobs:
       - name: Install dependencies
         if: runner.os == 'Windows'
         run: choco install ninja
-
-      - name: Install dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt update && sudo apt install -y ninja-build
 
       - name: Clone repository
         uses: actions/checkout@v3
