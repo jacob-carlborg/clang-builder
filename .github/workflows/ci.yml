@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.arch }}-${{ matrix.data.os.target }}${{ matrix.data.os.version }}
+    name: ${{ matrix.data.target_triple }}
     runs-on: ${{ matrix.data.os.host }}
     defaults:
       run:
@@ -42,6 +42,9 @@ jobs:
             os:
               target: windows
               host: windows-latest
+            extra_cmake_flags:
+              -D LLVM_ENABLE_PIC=Off
+              -D LLVM_USE_CRT_RELEASE=MT
 
         include:
           - arch: arm64
@@ -99,7 +102,7 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
 
   build_linux:
-    name: ${{ matrix.arch }}-linux
+    name: ${{ matrix.arch }}-alpine-linux-musl
     runs-on: ubuntu-latest
     container: alpine:latest
     env:
