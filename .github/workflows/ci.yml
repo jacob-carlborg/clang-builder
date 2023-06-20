@@ -33,35 +33,38 @@ jobs:
       matrix:
         arch: [x86_64]
         data:
-          - target_triple: x86_64-apple-macos10.9
-            os:
-              target: macos
-              host: macOS-latest
+          # - target_triple: x86_64-apple-macos10.9
+          #   os:
+          #     target: macos
+          #     host: macOS-latest
 
           - target_triple: x86_64-pc-windows-msvc
             os:
               target: windows
               host: windows-latest
+            extra_cmake_flags:
+              -D LLVM_ENABLE_PIC=Off
+              -D LLVM_USE_CRT_RELEASE=MT
 
-        include:
-          - arch: arm64
-            data:
-              cross_compile: true
-              target_triple: arm64-apple-macos11.0
-              os:
-                target: macos
-                host: macOS-latest
-              extra_cmake_flags: >
-                -DCMAKE_OSX_ARCHITECTURES=arm64
-
-          - arch: x86_64
-            data:
-              cross_compile: true
-              target_triple: x86_64-unknown-freebsd13.1
-              install_sdk: true
-              os:
-                target: FreeBSD
-                host: ubuntu-latest
+        # include:
+        #   - arch: arm64
+        #     data:
+        #       cross_compile: true
+        #       target_triple: arm64-apple-macos11.0
+        #       os:
+        #         target: macos
+        #         host: macOS-latest
+        #       extra_cmake_flags: >
+        #         -DCMAKE_OSX_ARCHITECTURES=arm64
+        #
+        #   - arch: x86_64
+        #     data:
+        #       cross_compile: true
+        #       target_triple: x86_64-unknown-freebsd13.1
+        #       install_sdk: true
+        #       os:
+        #         target: FreeBSD
+        #         host: ubuntu-latest
 
     steps:
       - name: Setup MSVC
@@ -98,29 +101,29 @@ jobs:
       #   if: failure()
       #   uses: mxschmitt/action-tmate@v3
 
-  build_linux:
-    name: ${{ matrix.arch }}-linux
-    runs-on: ubuntu-latest
-    container: alpine:latest
-    env:
-      BUILDER_ARCH: ${{ matrix.arch }}
-      BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
-      BUILDER_EXTRA_CMAKE_FLAGS: ${{ matrix.data.extra_cmake_flags }}
-      BUILDER_OS: linux
-      BUILDER_TARGET_TRIPLE: ${{ matrix.arch }}-alpine-linux-musl
-    strategy:
-      matrix:
-        arch: [x86_64]
-
-    steps:
-      - name: Install dependencies
-        run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja
-
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-
-      - uses: ./.github/workflows/support/shared
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+  # build_linux:
+  #   name: ${{ matrix.arch }}-linux
+  #   runs-on: ubuntu-latest
+  #   container: alpine:latest
+  #   env:
+  #     BUILDER_ARCH: ${{ matrix.arch }}
+  #     BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
+  #     BUILDER_EXTRA_CMAKE_FLAGS: ${{ matrix.data.extra_cmake_flags }}
+  #     BUILDER_OS: linux
+  #     BUILDER_TARGET_TRIPLE: ${{ matrix.arch }}-alpine-linux-musl
+  #   strategy:
+  #     matrix:
+  #       arch: [x86_64]
+  #
+  #   steps:
+  #     - name: Install dependencies
+  #       run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja
+  #
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         persist-credentials: false
+  #
+  #     - uses: ./.github/workflows/support/shared
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
