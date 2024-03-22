@@ -35,12 +35,14 @@ EOF
 export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
 
 if [ "$BUILDER_CROSS_COMPILE" = true ]; then
+  exe_extension="$(uname | grep -i -q mingw && echo '.exe' || echo '')"
+
   export MACOSX_DEPLOYMENT_TARGET=11
 extra_cmake_flags=$(cat << EOF
--D CLANG_TABLEGEN=$native_build_dir/bin/clang-tblgen
--D LLVM_CONFIG_PATH=$native_build_dir/bin/llvm-config
+-D CLANG_TABLEGEN=$native_build_dir/bin/clang-tblgen${exe_extension}
+-D LLVM_CONFIG_PATH=$native_build_dir/bin/llvm-config${exe_extension}
 -D LLVM_DEFAULT_TARGET_TRIPLE=$BUILDER_TARGET_TRIPLE
--D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen
+-D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen${exe_extension}
 -D LLVM_TARGET_ARCH=$BUILDER_ARCH
 ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
