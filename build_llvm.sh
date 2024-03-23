@@ -34,10 +34,15 @@ EOF
 
 export BUILDER_CROSS_TOOLCHAIN_DIR="$GITHUB_WORKSPACE/cross_toolchain/bin"
 
+if [ "$BUILDER_ARCH" = 'arm64' ]; then
+  export MACOSX_DEPLOYMENT_TARGET=11
+else
+  export MACOSX_DEPLOYMENT_TARGET=10.9
+fi
+
 if [ "$BUILDER_CROSS_COMPILE" = true ]; then
   exe_extension="$(uname | grep -i -q mingw && echo '.exe' || echo '')"
 
-  export MACOSX_DEPLOYMENT_TARGET=11
 extra_cmake_flags=$(cat << EOF
 -D CLANG_TABLEGEN=$native_build_dir/bin/clang-tblgen${exe_extension}
 -D LLVM_CONFIG_PATH=$native_build_dir/bin/llvm-config${exe_extension}
@@ -51,7 +56,6 @@ EOF
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
   fi
 else
-  export MACOSX_DEPLOYMENT_TARGET=10.9
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
 
