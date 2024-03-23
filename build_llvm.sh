@@ -3,7 +3,6 @@
 # Environment variables:
 # BUILDER_ARCH: the target architecture (required)
 # BUILDER_CROSS_COMPILE: 'true' indicates if we're cross-compiling
-# BUILDER_EXTRA_CMAKE_FLAGS: extra flags appended to CMake
 # BUILDER_OS: the target operating system (required). The name needs to be what Cmake expects: https://gitlab.kitware.com/cmake/cmake/-/issues/21489#note_1077167.
 # BUILDER_TARGET_TRIPLE: the triple of the target (required if cross-compiling)
 # GITHUB_WORKSPACE: the path to the Git repository checkout in GitHub actions (required)
@@ -49,14 +48,13 @@ extra_cmake_flags=$(cat << EOF
 -D LLVM_DEFAULT_TARGET_TRIPLE=$BUILDER_TARGET_TRIPLE
 -D LLVM_TABLEGEN=$native_build_dir/bin/llvm-tblgen${exe_extension}
 -D LLVM_TARGET_ARCH=$BUILDER_ARCH
-${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
   if [ -f "$toolchain_files_dir/$target_os.cmake" ]; then
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
   fi
 else
-  extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
+  extra_cmake_flags=""
 fi
 
 setup_cross_toolchain() {
