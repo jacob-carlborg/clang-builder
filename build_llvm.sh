@@ -47,7 +47,7 @@ extra_cmake_flags=$(cat << EOF
 ${BUILDER_EXTRA_CMAKE_FLAGS:-}
 EOF
 )
-  if ! [ "$target_os" = 'macos' ]; then
+  if [ -f "$toolchain_files_dir/$target_os.cmake" ]; then
     extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
   fi
 else
