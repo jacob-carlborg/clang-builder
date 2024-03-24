@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.data.target_triple }}
+    name: ${{ matrix.arch }}-${{ matrix.data.target_triple_suffix }}
     runs-on: ${{ matrix.data.os.host }}
     defaults:
       run:
@@ -26,18 +26,18 @@ jobs:
       BUILDER_ARCH: ${{ matrix.arch }}
       BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
       BUILDER_OS: ${{ matrix.data.os.target }}
-      BUILDER_TARGET_TRIPLE: ${{ matrix.data.target_triple }}
+      BUILDER_TARGET_TRIPLE: ${{ matrix.arch }}-${{ matrix.data.target_triple_suffix }}
     strategy:
       fail-fast: false
       matrix:
         arch: [x86_64]
         data:
-          - target_triple: x86_64-apple-macos10.9
+          - target_triple_suffix: apple-macos10.9
             os:
               target: macos
               host: macOS-latest
 
-          - target_triple: x86_64-pc-windows-msvc
+          - target_triple_suffix: pc-windows-msvc
             os:
               target: windows
               host: windows-latest
@@ -46,7 +46,7 @@ jobs:
           - arch: arm64
             data:
               cross_compile: true
-              target_triple: arm64-apple-macos11.0
+              target_triple_suffix: apple-macos11.0
               os:
                 target: macos
                 host: macOS-latest
@@ -54,7 +54,7 @@ jobs:
           - arch: x86_64
             data:
               cross_compile: true
-              target_triple: x86_64-unknown-freebsd13.1
+              target_triple_suffix: unknown-freebsd13.1
               install_sdk: true
               os:
                 target: FreeBSD
@@ -63,7 +63,7 @@ jobs:
           - arch: x86
             data:
               cross_compile: true
-              target_triple: x86-pc-windows-msvc
+              target_triple_suffix: pc-windows-msvc
               os:
                 target: windows
                 host: windows-latest
@@ -94,7 +94,7 @@ jobs:
       - name: Install SDK
         if: matrix.data.install_sdk
         run: |
-          curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v${{ env.sdk_version }}/sdk-${{ env.sdk_version }}-${{ matrix.data.target_triple }}.tar.xz'
+          curl -L -o sdk.tar.xz --retry 3 'https://github.com/d-cross-compiler/sdk-extractor/releases/download/v${{ env.sdk_version }}/sdk-${{ env.sdk_version }}-${{ env.BUILDER_TARGET_TRIPLE }}.tar.xz'
           tar xf sdk.tar.xz
 
       - uses: ./.github/workflows/support/shared
