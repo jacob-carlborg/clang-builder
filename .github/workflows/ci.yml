@@ -87,7 +87,7 @@ jobs:
         run: sudo apt update && sudo apt install -y ninja-build
 
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
@@ -123,7 +123,7 @@ jobs:
         run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja
 
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
