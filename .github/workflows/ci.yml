@@ -108,7 +108,7 @@ jobs:
   build_linux:
     name: ${{ matrix.arch }}-alpine-linux-musl
     runs-on: ubuntu-latest
-    container: alpine:latest
+    container: alpine:3.18
     env:
       BUILDER_ARCH: ${{ matrix.arch }}
       BUILDER_CROSS_COMPILE: ${{ matrix.data.cross_compile }}
