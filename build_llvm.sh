@@ -50,11 +50,12 @@ extra_cmake_flags=$(cat << EOF
 -D LLVM_TARGET_ARCH=$BUILDER_ARCH
 EOF
 )
-  if [ -f "$toolchain_files_dir/$target_os.cmake" ]; then
-    extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
-  fi
 else
   extra_cmake_flags=""
+fi
+
+if [ -f "$toolchain_files_dir/$target_os.cmake" ]; then
+  extra_cmake_flags="$extra_cmake_flags -D CMAKE_TOOLCHAIN_FILE=$toolchain_files_dir/$target_os.cmake"
 fi
 
 setup_cross_toolchain() {
