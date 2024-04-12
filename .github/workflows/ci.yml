@@ -60,7 +60,7 @@ jobs:
                 target: FreeBSD
                 host: ubuntu-latest
 
-          - arch: x86
+          - arch: i386
             data:
               cross_compile: true
               target_triple_suffix: pc-windows-msvc
