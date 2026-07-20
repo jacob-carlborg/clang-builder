@@ -36,7 +36,7 @@ jobs:
           - target_triple: x86_64-apple-macos10.9
             os:
               target: macos
-              host: macOS-latest
+              host: macos-26-intel
 
           - target_triple: x86_64-pc-windows-msvc
             os:
