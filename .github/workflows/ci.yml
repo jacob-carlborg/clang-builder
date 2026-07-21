@@ -110,7 +110,7 @@ jobs:
 
     steps:
       - name: Install dependencies
-        run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja
+        run: apk add --no-cache bash curl git bzip2 xz g++ gcc cmake python3 ninja linux-headers
 
       - name: Clone repository
         uses: actions/checkout@v3
