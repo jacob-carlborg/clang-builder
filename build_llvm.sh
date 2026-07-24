@@ -53,6 +53,19 @@ else
   extra_cmake_flags="${BUILDER_EXTRA_CMAKE_FLAGS:-}"
 fi
 
+# On Windows, libclang is built as both a shared and a static library, and both
+# use the name `libclang.lib` (the DLL's import library vs. the static archive),
+# so the import library clobbers the static archive in the output directory and
+# only the ~100 KB import lib ends up shipped. Consumers then resolve the
+# libclang C API from a `libclang.dll` found on the host at run time, which is a
+# different LLVM version. Disabling PIC drops the shared libclang build (PIC is
+# a no-op on Windows), leaving a genuine static `libclang.lib` to link against.
+# On other platforms the shared/static libclang have distinct names
+# (libclang.so/.dylib vs libclang.a) and don't collide, so leave them untouched.
+if [ "$target_os" = 'windows' ]; then
+  extra_cmake_flags="$extra_cmake_flags -D LLVM_ENABLE_PIC=OFF"
+fi
+
 setup_cross_toolchain() {
   (! [ "$BUILDER_CROSS_COMPILE" = true ] || [ "$target_os" = 'macos' ]) && return
 
